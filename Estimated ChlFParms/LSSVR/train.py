@@ -18,7 +18,7 @@ from LoadDataset_Params_Raw import Fusion_OJIP_Dataset
 import logging
 from torch.utils.data import DataLoader, ConcatDataset
 
-# 配置日志记录
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def to_numpy(data):
@@ -27,17 +27,17 @@ def to_numpy(data):
     elif isinstance(data, torch.Tensor):
         return data.numpy()
     else:
-        raise TypeError(f"不支持的数据类型: {type(data)}")
+        raise TypeError(f"unsupport type: {type(data)}")
 
 def load_datasets(file_path_l, file_path_d, batch_size=16):
     train_dataset = Fusion_OJIP_Dataset(file_path_l, file_path_d, train=True, val=False, train_ratio=0.8, val_ratio=0.1)
     val_dataset = Fusion_OJIP_Dataset(file_path_l, file_path_d, train=False, val=True, train_ratio=0.8, val_ratio=0.1)
     test_dataset = Fusion_OJIP_Dataset(file_path_l, file_path_d, train=False, val=False, train_ratio=0.8, val_ratio=0.1)
     
-    # 合并训练集和验证集
+    
     combined_train_val_dataset = ConcatDataset([train_dataset, val_dataset])
     
-    # 创建 DataLoader
+    # build DataLoader
     train_loader = DataLoader(combined_train_val_dataset, batch_size=batch_size, shuffle=True,drop_last=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False,drop_last=True)
     
@@ -66,7 +66,7 @@ def evaluate_model(model, test_loader):
     y_true = np.vstack(y_true)
     y_pred = np.vstack(y_pred)
     
-    # 反归一化
+    
     y_pred = y_pred * test_loader.dataset.new_std_d + test_loader.dataset.new_mean_d
     y_true = y_true * test_loader.dataset.new_std_d + test_loader.dataset.new_mean_d
     
@@ -126,21 +126,21 @@ def main():
     file_path_l = './data/ChlFData_l.pkl'
     file_path_d = './data/ChlFData_d.pkl'
     
-    logging.info("加载数据集...")
+    logging.info("Load dataset...")
     train_loader, test_loader = load_datasets(file_path_l, file_path_d, batch_size=16)
     
-    logging.info("训练模型...")
+    logging.info("training...")
     model = train_model(train_loader)
     
-    logging.info("评估模型...")
+    logging.info("evluating...")
     rmspe_test, r2_test, rpd_test, smape_test, y_test, y_pred_test = evaluate_model(model, test_loader)
     
-    logging.info(f'测试集 R2: {r2_test}')
-    logging.info(f'测试集 RMSPE: {rmspe_test}')
-    logging.info(f'测试集 RPD: {rpd_test}')
-    logging.info(f'测试集 SMAPE: {smape_test}')
+    logging.info(f'testset R2: {r2_test}')
+    logging.info(f'testset RMSPE: {rmspe_test}')
+    logging.info(f'testset RPD: {rpd_test}')
+    logging.info(f'testset SMAPE: {smape_test}')
     
-    logging.info("将结果保存到 Excel 文件...")
+    logging.info("save excel file...")
     print(y_test.shape,y_pred_test.shape)
     save_results(y_test, y_pred_test)
 

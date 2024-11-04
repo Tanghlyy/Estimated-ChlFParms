@@ -22,7 +22,7 @@ import pandas as pd
 
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0" #指定使用GPU的ID
+os.environ["CUDA_VISIBLE_DEVICES"] = "0" # Specify the GPU ID to use
 import time
 import argparse
 from LoadDataset_Params_Raw import Fusion_OJIP_Dataset
@@ -31,9 +31,9 @@ from LSTM import LSTMRegression
 from utils import AverageMeter, initialize_logger, save_checkpoint, record_loss
 import numpy as np
 from sklearn.model_selection import train_test_split
-parser = argparse.ArgumentParser(description='Image Classification:') #创建参数解析器对象
+parser = argparse.ArgumentParser(description='Image Classification:') # Create argument parser object
 parser.add_argument('--model_path', type=str, default='ChlF_Model',
-                    help="Set model storage path") #添加参数
+                    help="Set model storage path") # Add argument
 
 args = parser.parse_args() #解析命令行参数
 file_path_l = './data/ChlFData_l.pkl'
@@ -44,7 +44,7 @@ batch_size = 16
 # model input  feature size is 478(all) or 20(params)
 features = 478
 def main():
-    cudnn.benchmark = True #优化网络运行性能
+    cudnn.benchmark = True # Parse command line arguments
     model = LSTMRegression(1, 128, features, 2)
     # torchinfo.summary(model)
     # model = MLSTMfcn(num_classes=4, max_seq_len=457, num_features=4)
@@ -216,8 +216,8 @@ def validate(val_data_loader, model, criterion, device):
         output = output.data.cpu().numpy()
         label = label.cpu().numpy()
         for i in range(batch_size):
-            out_data = output[i] #预测值
-            val_label = label[i] #真实值
+            out_data = output[i] # Predicted value
+            val_label = label[i] # True value
             # out_data = out_data * val_dataset.new_std_d[:features] + val_dataset.new_mean_d[:features]
             # val_label = val_label * val_dataset.new_std_d[:features] + val_dataset.new_mean_d[:features]
             res1.append(val_label)

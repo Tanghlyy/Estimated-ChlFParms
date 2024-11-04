@@ -15,7 +15,7 @@ class LSTMRegression(nn.Module):
     def forward(self, x):
         x = x.transpose(2, 1)
         
-        # 初始化LSTM隐藏状态
+        # 
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
         c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
         

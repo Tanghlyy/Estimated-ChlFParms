@@ -28,25 +28,24 @@ from DLinear import Model
 from LoadDataset_Params_Raw import Fusion_OJIP_Dataset
 from myutils import AverageMeter, initialize_logger, save_checkpoint, record_loss
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # 指定使用GPU的ID
+os.environ["CUDA_VISIBLE_DEVICES"] = "0" # Specify the GPU ID to use
 
-parser = argparse.ArgumentParser(description='Image Classification:')  # 创建参数解析器对象
+parser = argparse.ArgumentParser(description='Image Classification:')  # Create argument parser object
 parser.add_argument('--model_path', type=str, default='ChlF_Model',
-                    help="Set model storage path")  # 添加参数
+                    help="Set model storage path")  # Add argument
 
-args = parser.parse_args()  # 解析命令行参数
+args = parser.parse_args()  # Parse command line arguments
 file_path_l = './data/ChlFData_l.pkl'
 file_path_d = './data/ChlFData_d.pkl'
 train_dataset = Fusion_OJIP_Dataset(file_path_l, file_path_d, train=True, val=False, train_ratio=0.6, val_ratio=0.2)
 val_dataset = Fusion_OJIP_Dataset(file_path_l, file_path_d, train=False, val=True, train_ratio=0.6, val_ratio=0.2)
 batch_size = 16
 
-# 修改模型输入输出维度
+
 seq_len = 458
 pred_len = 478
 
 
-# 配置参数类
 class Configs:
     def __init__(self):
         self.task_name = 'short_term_forecast'
@@ -58,7 +57,7 @@ class Configs:
         self.moving_avg = 25
 
 def main():
-    cudnn.benchmark = True  # 优化网络运行性能
+    cudnn.benchmark = True  # Optimize network performance
     configs = Configs()
     model = Model(configs)
     

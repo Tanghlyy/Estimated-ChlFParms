@@ -17,20 +17,20 @@ from LoadDataset_Params_Raw import Fusion_OJIP_Dataset
 from sklearn.metrics import r2_score
 import numpy as np
 
-# 参数设置
+# Parameter settings
 batch_size = 16 
 features = 478
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# 加载模型
-model_path = './models/ChlF_Model/best.pkl'  # 使用保存的最佳模型
+# Load model
+model_path = './models/ChlF_Model/best.pkl'  # Use the saved best model
 model = CNNLSTM(input_size=458,num_classes=features)
 model = nn.DataParallel(model)
 model = model.to(device=device, dtype=torch.float)
 checkpoint = torch.load(model_path)
 model.load_state_dict(checkpoint['state_dict'])
 
-# 准备测试数据
+# Prepare test data
 test_dataset = Fusion_OJIP_Dataset('./data/ChlFData_l.pkl', './data/ChlFData_d.pkl', train=False,val=False,train_ratio=0.6,val_ratio=0.2)
 test_data_loader = DataLoader(dataset=test_dataset, num_workers=4, batch_size=batch_size, shuffle=False, pin_memory=True, drop_last=True)
 
@@ -48,7 +48,7 @@ print(load_model(model_path,model))
 
 
 
-# 进行测试
+# Perform testing
 model.eval()
 res1 = []
 res2 = []
@@ -60,17 +60,17 @@ with torch.no_grad():
         data = data.to(device=device)
         label = label.to(device=device)
         # plant_name = plant_name.to(device=device)
-        # 预测
+        # Prediction
         output = model(data)      
-        # 将预测结果和真实结果添加到列表中
+        # Add prediction results and true results to the list
         output = output.data.cpu().numpy()
         label = label.cpu().numpy()
         input_l = data.cpu().numpy()[:,0,:]
         for i in range(batch_size):
             data_l = input_l[i]
-            out_data = output[i]  # 预测值
-            test_label = label[i]  # 真实值
-            name = plant_name[i] # 获取每类样本的名称
+            out_data = output[i]  # Predicted value
+            test_label = label[i]  # True value
+            name = plant_name[i] # Get the name of each sample
             out_data = out_data * test_dataset.new_std_d[:features] + test_dataset.new_mean_d[:features]
             test_label = test_label * test_dataset.new_std_d[:features] + test_dataset.new_mean_d[:features]
             data_l = data_l * test_dataset.new_std_l + test_dataset.new_mean_l
@@ -79,12 +79,12 @@ with torch.no_grad():
             res3.append(data_l)
             name_list.append(name)
 
-# 转换为numpy数组
+# Convert to numpy arrays
 res1 = np.array(res1)
 res2 = np.array(res2)
 res3 = np.array(res3)
 name_list = np.array(name_list)
-# 计算 R² 值
+# Calculate R² value
 r2_res = 0
 for i in range(res1.shape[1]):
     r2_res += r2_score(res1[:,i], res2[:,i])
